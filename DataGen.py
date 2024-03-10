@@ -18,18 +18,18 @@ def process_img(img, filename):
             norm_array = array - array.mean()
             norm_array /= norm_array.std()
             for k in range(num_channels):
-                noise = np.random.normal(norm_array.mean(), norm_array.std(), noise_size)
+                noise = np.random.normal(0, 1, noise_size)
                 norm_array[i * noise_size[0]:(i + 1) * noise_size[0],
                 j * noise_size[1]:(j + 1) * noise_size[1],
                 k] = noise
 
             new_img = array_to_img(norm_array)
 
-            save_path = os.path.join(drive_path, "MyDataset", filename.split(".")[0])
+            save_path = os.path.join("MyDataset", filename.split(".")[0])
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
 
-            new_img.save(os.path.join(save_path, f"{i}.jpg"))
+            new_img.save(os.path.join(save_path, f"{i*4 + j}.jpg"))
 
 
 start_time = time.time()
