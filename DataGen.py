@@ -6,8 +6,9 @@ import time
 image_size = (256, 256)
 noise_size = (64, 64)
 num_channels = 3
-drive_path = "C:\\Users\\Bazelevs\\Downloads"
+base_path = "C:\\Users\\Bazelevs\\Downloads\\arcDataset"
 stop_entries = ["Achaemenid architecture", "Ancient Egyptian architecture", "Novelty architecture"]
+skipped = 0
 
 
 def process_img(img, filename):
@@ -33,18 +34,22 @@ def process_img(img, filename):
 
 
 start_time = time.time()
-abs_path = os.path.join(drive_path, "arcDataset")
-for entry in os.listdir(abs_path):
-    path = os.path.join(abs_path, entry)
+for entry in os.listdir(base_path):
+    path = os.path.join(base_path, entry)
     if os.path.isdir(path) and entry not in stop_entries:
         for filename in os.listdir(path):
+            path_to_img = os.path.join(path, filename)
+            if "%" in filename:
+                path_to_img = "\\\\?\\" + path_to_img
+                filename = filename[:filename.find("%")] + ".jpg"
+            print(f"Processing: {path_to_img}")
             try:
-                print(f"Processing: {os.path.join(path, filename)}")
-                img = load_img(os.path.join(path, filename),
+                img = load_img(path_to_img,
                                target_size=image_size,
                                interpolation="hamming")
                 process_img(img, filename)
-            except FileNotFoundError as err:
-                print(f"No such file or directory: {err.filename}")
+            except Exception:
+                print(f"Error occurred with {path_to_img}")
+                skipped += 1
 
-print("--- %s seconds ---" % (time.time() - start_time))
+print(f"--- {time.time() - start_time} seconds, skipped {skipped} files ---")
